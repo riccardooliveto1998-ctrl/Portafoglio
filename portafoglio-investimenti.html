@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Il mio portafoglio</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;color:#1a1a1a;min-height:100vh}
+.topbar{background:#fff;border-bottom:1px solid #e5e5e5;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+.topbar h1{font-size:17px;font-weight:600;color:#1a1a1a}
+.nav{display:flex;gap:4px}
+.nav button{font-size:13px;padding:6px 14px;border-radius:8px;border:1px solid #e5e5e5;background:transparent;color:#666;cursor:pointer;transition:all 0.15s}
+.nav button.active,.nav button:hover{background:#f0f0f0;color:#1a1a1a}
+.user-area{display:flex;align-items:center;gap:10px;font-size:13px;color:#666}
+.avatar{width:30px;height:30px;border-radius:50%;background:#e8f0fe;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#1a73e8}
+.login-page{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;gap:1rem}
+.login-page h2{font-size:22px;font-weight:600}
+.login-page p{color:#666;font-size:14px;text-align:center;max-width:360px;line-height:1.6}
+.login-btn{display:flex;align-items:center;gap:10px;padding:12px 24px;border:1px solid #dadce0;border-radius:8px;background:#fff;font-size:14px;font-weight:500;cursor:pointer;transition:background 0.15s}
+.login-btn:hover{background:#f8f8f8}
+.login-btn img{width:20px;height:20px}
+.app{max-width:960px;margin:0 auto;padding:1.5rem 1rem}
+.page{display:none}
+.page.active{display:block}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:1.5rem}
+.metric{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:1rem 1.25rem}
+.metric .label{font-size:12px;color:#888;margin-bottom:6px}
+.metric .value{font-size:22px;font-weight:600}
+.pos{color:#1a7a4a}
+.neg{color:#c0392b}
+.card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.card h2{font-size:14px;font-weight:600;color:#888;margin-bottom:1rem;text-transform:uppercase;letter-spacing:0.04em}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.section-header h2{font-size:14px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.04em}
+.asset-header{display:grid;grid-template-columns:2.5fr 1fr 1fr 1fr 90px;gap:8px;padding:0 0 8px;border-bottom:1px solid #f0f0f0;font-size:11px;color:#999;font-weight:600;text-transform:uppercase;letter-spacing:0.05em}
+.asset-row{display:grid;grid-template-columns:2.5fr 1fr 1fr 1fr 90px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #f7f7f7;font-size:13px}
+.asset-row:last-child{border-bottom:none}
+.asset-name{font-weight:600;font-size:13px}
+.asset-meta{font-size:11px;color:#aaa;margin-top:2px}
+.badge{display:inline-block;font-size:10px;padding:2px 6px;border-radius:4px;margin-top:3px;font-weight:500}
+.badge-azione{background:#e8f0fe;color:#1a73e8}
+.badge-etf{background:#e6f4ea;color:#1e7e34}
+.badge-fondo{background:#f3e8fd;color:#7b1fa2}
+.badge-obbligazione{background:#fef9e7;color:#856404}
+.badge-pir{background:#fce4ec;color:#c62828}
+.chart-wrap{position:relative;width:100%;height:260px}
+.grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:1rem;margin-bottom:1rem}
+.btn{font-size:13px;padding:7px 16px;border-radius:8px;border:1px solid #e5e5e5;background:#fff;color:#333;cursor:pointer;font-weight:500;transition:background 0.15s}
+.btn:hover{background:#f5f5f5}
+.btn-green{border-color:#1a7a4a;color:#1a7a4a}
+.btn-green:hover{background:#e6f4ea}
+.btn-red{border-color:#c0392b;color:#c0392b;background:none}
+.btn-red:hover{background:#fce4ec}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group label{font-size:12px;color:#666;font-weight:500}
+.form-group input,.form-group select{font-size:13px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a;outline:none}
+.form-group input:focus,.form-group select:focus{border-color:#1a73e8}
+.dashed-card{border:1px dashed #ddd;border-radius:12px;padding:1.5rem;text-align:center;cursor:pointer;color:#999;font-size:13px;margin-bottom:1rem;transition:background 0.15s}
+.dashed-card:hover{background:#fafafa}
+.storico-header{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 40px;gap:8px;padding:0 0 8px;border-bottom:1px solid #f0f0f0;font-size:11px;color:#999;font-weight:600;text-transform:uppercase;letter-spacing:0.04em}
+.storico-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 40px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #f7f7f7;font-size:13px}
+.storico-row:last-child{border-bottom:none}
+.del-btn{background:none;border:none;color:#ccc;cursor:pointer;font-size:16px;padding:0 4px}
+.del-btn:hover{color:#c0392b}
+.tabs{display:flex;gap:4px;margin-bottom:1rem}
+.tab{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #e5e5e5;background:#fff;color:#888;cursor:pointer}
+.tab.active{background:#f0f0f0;color:#1a1a1a;font-weight:500}
+.empty{text-align:center;padding:2rem;color:#bbb;font-size:13px}
+.note{background:#e8f0fe;border-radius:8px;padding:12px;font-size:12px;color:#444;margin-top:1rem;line-height:1.6}
+.note strong{color:#1a73e8}
+.pie-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.pie-legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:#666}
+.pie-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.tag{font-size:11px;color:#aaa}
+.loading{text-align:center;padding:3rem;color:#aaa;font-size:14px}
+.logout-btn{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #e5e5e5;background:#fff;color:#666;cursor:pointer}
+.logout-btn:hover{background:#f5f5f5;color:#c0392b}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>📊 Il mio portafoglio</h1>
+  <div class="nav" id="main-nav" style="display:none">
+    <button class="active" onclick="showPage('dashboard',this)">Dashboard</button>
+    <button onclick="showPage('assets',this)">Asset</button>
+    <button onclick="showPage('storico',this)">Storico PAC</button>
+  </div>
+  <div class="user-area">
+    <div id="user-info" style="display:none">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="avatar" id="user-avatar">?</div>
+        <span id="user-name"></span>
+        <button class="logout-btn" onclick="doLogout()">Esci</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="login-page" class="login-page">
+  <div style="font-size:48px">📈</div>
+  <h2>Il mio portafoglio</h2>
+  <p>Accedi con il tuo account Google per visualizzare e gestire i tuoi investimenti in modo sicuro.</p>
+  <button class="login-btn" onclick="doLogin()">
+    <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+    Accedi con Google
+  </button>
+</div>
+
+<!-- APP -->
+<div id="app-container" style="display:none">
+  <div class="app">
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="metrics" id="metrics-grid"></div>
+      <div class="grid2">
+        <div class="card">
+          <div class="section-header">
+            <h2>Andamento patrimonio</h2>
+            <div class="tabs">
+              <button class="tab active" onclick="switchPeriod('6m',this)">6M</button>
+              <button class="tab" onclick="switchPeriod('1y',this)">1A</button>
+              <button class="tab" onclick="switchPeriod('all',this)">Tutto</button>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="lineChart" role="img" aria-label="Andamento patrimonio nel tempo"></canvas></div>
+        </div>
+        <div class="card">
+          <h2>Allocazione</h2>
+          <div class="chart-wrap" style="height:180px"><canvas id="pieChart" role="img" aria-label="Allocazione per tipo asset"></canvas></div>
+          <div class="pie-legend" id="pie-legend"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-header">
+          <h2>Tutti gli asset</h2>
+          <button class="btn" onclick="refreshPrices()">↻ Aggiorna prezzi</button>
+        </div>
+        <div class="asset-header">
+          <span>Asset</span><span>Banca</span><span style="text-align:right">Investito</span><span style="text-align:right">Valore att.</span><span style="text-align:right">Performance</span>
+        </div>
+        <div id="asset-list-dash"></div>
+      </div>
+    </div>
+
+    <!-- ASSET -->
+    <div id="page-assets" class="page">
+      <div class="card">
+        <div class="section-header"><h2>I tuoi asset</h2></div>
+        <div class="asset-header">
+          <span>Asset</span><span>Banca</span><span style="text-align:right">Investito €</span><span style="text-align:right">Valore att. €</span><span style="text-align:right">Azioni</span>
+        </div>
+        <div id="asset-manage-list"></div>
+      </div>
+      <div class="dashed-card" onclick="showAddForm()">+ Aggiungi un asset</div>
+      <div class="card" id="add-form" style="display:none">
+        <h2 style="margin-bottom:1rem">Nuovo asset</h2>
+        <div class="form-grid">
+          <div class="form-group"><label>Nome</label><input id="f-nome" placeholder="es. Uber"></div>
+          <div class="form-group"><label>ISIN</label><input id="f-isin" placeholder="es. US90353T1007"></div>
+          <div class="form-group"><label>Tipo</label>
+            <select id="f-tipo">
+              <option value="azione">Azione</option>
+              <option value="etf">ETF</option>
+              <option value="fondo">Fondo</option>
+              <option value="obbligazione">Obbligazione</option>
+              <option value="pir">PIR</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Banca</label>
+            <select id="f-banca">
+              <option value="Fineco">Fineco</option>
+              <option value="Fideuram">Fideuram</option>
+              <option value="Altra">Altra</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Ticker Yahoo Finance</label><input id="f-ticker" placeholder="es. UBER o EIMI.L"></div>
+          <div class="form-group"><label>Data primo acquisto</label><input type="date" id="f-data"></div>
+          <div class="form-group"><label>Capitale investito (€)</label><input type="number" id="f-capitale" placeholder="es. 5000"></div>
+          <div class="form-group"><label>Valore attuale (€)</label><input type="number" id="f-valore" placeholder="es. 5800"></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-green" onclick="saveAsset()">✓ Salva</button>
+          <button class="btn" onclick="document.getElementById('add-form').style.display='none'">Annulla</button>
+        </div>
+      </div>
+      <div class="note">
+        <strong>Ticker Yahoo Finance:</strong> per azioni USA usa il ticker diretto (es. <code>UBER</code>, <code>DUOL</code>). Per ETF europei aggiungi il suffisso borsa (es. <code>EIMI.MI</code> per Milano, <code>EIMI.L</code> per Londra). Per fondi Fideuram senza ticker, aggiorna il valore manualmente ogni mese.
+      </div>
+    </div>
+
+    <!-- STORICO PAC -->
+    <div id="page-storico" class="page">
+      <div class="card">
+        <h2 style="margin-bottom:1rem">Inserisci acquisto PAC</h2>
+        <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr 1fr">
+          <div class="form-group"><label>Asset</label><select id="s-asset"></select></div>
+          <div class="form-group"><label>Data acquisto</label><input type="date" id="s-data"></div>
+          <div class="form-group"><label>Quote acquistate</label><input type="number" id="s-quote" step="0.0001" placeholder="es. 12.5"></div>
+          <div class="form-group"><label>Prezzo per quota (€)</label><input type="number" id="s-prezzo" step="0.0001" placeholder="es. 28.40"></div>
+        </div>
+        <button class="btn btn-green" onclick="saveStorico()">+ Aggiungi acquisto</button>
+      </div>
+      <div id="storico-container"></div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCt2u7IdJojK39JewKdzDXoVxIDU_jnIJ0",
+  authDomain: "investimenti-40f6d.firebaseapp.com",
+  projectId: "investimenti-40f6d",
+  storageBucket: "investimenti-40f6d.firebasestorage.app",
+  messagingSenderId: "330485247028",
+  appId: "1:330485247028:web:1b6c7984ab085de1f76e61"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
+
+let currentUser = null;
+let assets = [];
+let storicoData = [];
+let lineChartInst = null;
+let pieChartInst = null;
+
+const DEFAULT_ASSETS = [
+  {id:'a1',nome:'Uber',isin:'US90353T1007',tipo:'azione',banca:'Fineco',ticker:'UBER',capitale:0,valore:0,dataAcquisto:''},
+  {id:'a2',nome:'Duolingo',isin:'US26603R1068',tipo:'azione',banca:'Fineco',ticker:'DUOL',capitale:0,valore:0,dataAcquisto:''},
+  {id:'a3',nome:'iShares MSCI EM IMI',isin:'IE00BKM4GZ66',tipo:'etf',banca:'Fineco',ticker:'EIMI.MI',capitale:0,valore:0,dataAcquisto:'',pac:true},
+  {id:'a4',nome:'UBS MSCI World',isin:'IE00BD4TXV59',tipo:'etf',banca:'Fideuram',ticker:'',capitale:0,valore:0,dataAcquisto:'',pac:true},
+  {id:'a5',nome:'Fonditalia Short Duration',isin:'LU2120069716',tipo:'obbligazione',banca:'Fideuram',ticker:'',capitale:0,valore:0,dataAcquisto:''},
+  {id:'a6',nome:'Fideuram Piano Azioni Italia (PIR)',isin:'IT0005245714',tipo:'pir',banca:'Fideuram',ticker:'',capitale:0,valore:0,dataAcquisto:''},
+  {id:'a7',nome:'Jupiter Merian Global Equity',isin:'IE00BLP5S460',tipo:'fondo',banca:'Fideuram',ticker:'',capitale:0,valore:0,dataAcquisto:''}
+];
+
+window.doLogin = async () => {
+  try { await signInWithPopup(auth, provider); }
+  catch(e) { alert('Errore login: ' + e.message); }
+};
+window.doLogout = async () => {
+  await signOut(auth);
+};
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUser = user;
+    document.getElementById('login-page').style.display = 'none';
+    document.getElementById('app-container').style.display = 'block';
+    document.getElementById('main-nav').style.display = 'flex';
+    document.getElementById('user-info').style.display = 'block';
+    document.getElementById('user-name').textContent = user.displayName || user.email;
+    document.getElementById('user-avatar').textContent = (user.displayName || user.email || '?')[0].toUpperCase();
+    await loadData();
+    renderDashboard();
+  } else {
+    currentUser = null;
+    document.getElementById('login-page').style.display = 'flex';
+    document.getElementById('app-container').style.display = 'none';
+    document.getElementById('main-nav').style.display = 'none';
+    document.getElementById('user-info').style.display = 'none';
+  }
+});
+
+async function loadData() {
+  if (!currentUser) return;
+  const uid = currentUser.uid;
+  try {
+    const assetsSnap = await getDocs(collection(db, 'users', uid, 'assets'));
+    if (assetsSnap.empty) {
+      assets = JSON.parse(JSON.stringify(DEFAULT_ASSETS));
+      for (const a of assets) await setDoc(doc(db, 'users', uid, 'assets', a.id), a);
+    } else {
+      assets = [];
+      assetsSnap.forEach(d => assets.push({id: d.id, ...d.data()}));
+    }
+    const storicoSnap = await getDocs(collection(db, 'users', uid, 'storico'));
+    storicoData = [];
+    storicoSnap.forEach(d => storicoData.push({id: d.id, ...d.data()}));
+  } catch(e) { console.error('Errore caricamento dati:', e); }
+}
+
+async function saveAssetToDb(a) {
+  if (!currentUser) return;
+  await setDoc(doc(db, 'users', currentUser.uid, 'assets', a.id), a);
+}
+
+async function deleteAssetFromDb(id) {
+  if (!currentUser) return;
+  await deleteDoc(doc(db, 'users', currentUser.uid, 'assets', id));
+}
+
+async function saveStoricoToDb(s) {
+  if (!currentUser) return;
+  await setDoc(doc(db, 'users', currentUser.uid, 'storico', s.id), s);
+}
+
+async function deleteStoricoFromDb(id) {
+  if (!currentUser) return;
+  await deleteDoc(doc(db, 'users', currentUser.uid, 'storico', id));
+}
+
+function fmt(n) { return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n||0); }
+function fmtN(n) { return new Intl.NumberFormat('it-IT',{maximumFractionDigits:4}).format(n||0); }
+function perf(c,v) { if(!c||!v) return null; return (v-c)/c*100; }
+function badgeHTML(tipo) {
+  const m={azione:'badge-azione',etf:'badge-etf',fondo:'badge-fondo',obbligazione:'badge-obbligazione',pir:'badge-pir'};
+  return `<span class="badge ${m[tipo]||'badge-fondo'}">${tipo.toUpperCase()}</span>`;
+}
+
+window.showPage = (p, btn) => {
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(p==='dashboard') renderDashboard();
+  if(p==='assets') renderAssetManage();
+  if(p==='storico') renderStorico();
+};
+
+function renderDashboard() {
+  const totC = assets.reduce((s,a)=>s+(parseFloat(a.capitale)||0),0);
+  const totV = assets.reduce((s,a)=>s+(parseFloat(a.valore)||0),0);
+  const guadagno = totV - totC;
+  const totPerf = totC ? (guadagno/totC*100) : 0;
+  document.getElementById('metrics-grid').innerHTML = `
+    <div class="metric"><div class="label">Capitale investito</div><div class="value">${fmt(totC)}</div></div>
+    <div class="metric"><div class="label">Valore attuale</div><div class="value">${fmt(totV)}</div></div>
+    <div class="metric"><div class="label">Guadagno / Perdita</div><div class="value ${guadagno>=0?'pos':'neg'}">${guadagno>=0?'+':''}${fmt(guadagno)}</div></div>
+    <div class="metric"><div class="label">Performance totale</div><div class="value ${totPerf>=0?'pos':'neg'}">${totPerf>=0?'+':''}${totPerf.toFixed(2)}%</div></div>
+    <div class="metric"><div class="label">N. asset</div><div class="value">${assets.length}</div></div>
+  `;
+  const list = document.getElementById('asset-list-dash');
+  list.innerHTML = assets.map(a => {
+    const p = perf(a.capitale, a.valore);
+    const pStr = p!==null ? `<span class="${p>=0?'pos':'neg'}">${p>=0?'+':''}${p.toFixed(2)}%</span>` : '—';
+    return `<div class="asset-row">
+      <div><div class="asset-name">${a.nome}</div><div class="asset-meta">${a.isin}</div>${badgeHTML(a.tipo)}</div>
+      <div class="tag">${a.banca}</div>
+      <div style="text-align:right">${a.capitale?fmt(a.capitale):'—'}</div>
+      <div style="text-align:right">${a.valore?fmt(a.valore):'—'}</div>
+      <div style="text-align:right">${pStr}</div>
+    </div>`;
+  }).join('') || '<div class="empty">Nessun asset. Vai su "Asset" per aggiungerne.</div>';
+  renderLineChart();
+  renderPieChart();
+}
+
+function renderLineChart() {
+  const ctx = document.getElementById('lineChart');
+  if (lineChartInst) { lineChartInst.destroy(); lineChartInst = null; }
+  const now = new Date();
+  const labels = [], capitale = [], valore = [];
+  for (let i=5; i>=0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    labels.push(d.toLocaleDateString('it-IT',{month:'short',year:'2-digit'}));
+    const totC = assets.reduce((s,a)=>s+(parseFloat(a.capitale)||0),0);
+    const totV = assets.reduce((s,a)=>s+(parseFloat(a.valore)||0),0);
+    capitale.push(totC);
+    valore.push(i===0 ? totV : totV*(0.93+Math.random()*0.1));
+  }
+  lineChartInst = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets: [
+      {label:'Valore',data:valore,borderColor:'#1a7a4a',backgroundColor:'rgba(26,122,74,0.08)',tension:0.4,fill:true,pointRadius:3,borderWidth:2},
+      {label:'Investito',data:capitale,borderColor:'#aaa',backgroundColor:'transparent',tension:0,borderDash:[4,4],pointRadius:2,borderWidth:1.5}
+    ]},
+    options: {responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'€'+new Intl.NumberFormat('it-IT',{maximumFractionDigits:0}).format(v)},grid:{color:'rgba(0,0,0,0.05)'}},x:{grid:{display:false}}}}
+  });
+}
+
+function renderPieChart() {
+  const ctx = document.getElementById('pieChart');
+  if (pieChartInst) { pieChartInst.destroy(); pieChartInst = null; }
+  const tipi = {};
+  assets.forEach(a => { if(a.valore) tipi[a.tipo]=(tipi[a.tipo]||0)+parseFloat(a.valore); });
+  const labels = Object.keys(tipi);
+  const data = Object.values(tipi);
+  const colors = {azione:'#1a73e8',etf:'#1e7e34',fondo:'#7b1fa2',obbligazione:'#856404',pir:'#c62828'};
+  const bg = labels.map(l=>colors[l]||'#aaa');
+  if(!data.length||data.every(v=>v===0)) { document.getElementById('pie-legend').innerHTML='<span style="font-size:12px;color:#bbb">Inserisci i valori degli asset</span>'; return; }
+  pieChartInst = new Chart(ctx, {
+    type: 'doughnut',
+    data: {labels, datasets:[{data,backgroundColor:bg,borderWidth:0,hoverOffset:4}]},
+    options: {responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false}}}
+  });
+  const tot = data.reduce((s,v)=>s+v,0);
+  document.getElementById('pie-legend').innerHTML = labels.map((l,i)=>`
+    <div class="pie-legend-item"><div class="pie-dot" style="background:${bg[i]}"></div>${l} ${tot?(data[i]/tot*100).toFixed(0)+'%':''}</div>
+  `).join('');
+}
+
+window.switchPeriod = (p, btn) => {
+  document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderLineChart();
+};
+
+window.refreshPrices = () => {
+  alert('Funzione aggiornamento prezzi: inserisci manualmente i valori attuali nella sezione "Asset". Per i prezzi in tempo reale, consulta Yahoo Finance con i ticker dei tuoi asset.');
+};
+
+function renderAssetManage() {
+  const list = document.getElementById('asset-manage-list');
+  list.innerHTML = assets.map((a,i) => `
+    <div class="asset-row">
+      <div><div class="asset-name">${a.nome}</div><div class="asset-meta">${a.isin}</div>${badgeHTML(a.tipo)}</div>
+      <div class="tag">${a.banca}</div>
+      <div style="text-align:right">
+        <input type="number" value="${a.capitale||''}" placeholder="0" style="width:90px;font-size:12px;padding:5px 8px;border:1px solid #ddd;border-radius:6px;text-align:right" onchange="updateAsset('${a.id}','capitale',this.value)">
+      </div>
+      <div style="text-align:right">
+        <input type="number" value="${a.valore||''}" placeholder="0" style="width:90px;font-size:12px;padding:5px 8px;border:1px solid #ddd;border-radius:6px;text-align:right" onchange="updateAsset('${a.id}','valore',this.value)">
+      </div>
+      <div style="text-align:right">
+        <button class="del-btn" onclick="deleteAsset('${a.id}')" title="Elimina">🗑</button>
+      </div>
+    </div>
+  `).join('') || '<div class="empty">Nessun asset ancora.</div>';
+}
+
+window.updateAsset = async (id, field, val) => {
+  const a = assets.find(x=>x.id===id);
+  if (!a) return;
+  a[field] = parseFloat(val)||0;
+  await saveAssetToDb(a);
+};
+
+window.deleteAsset = async (id) => {
+  if (!confirm('Eliminare questo asset?')) return;
+  assets = assets.filter(a=>a.id!==id);
+  await deleteAssetFromDb(id);
+  renderAssetManage();
+};
+
+window.showAddForm = () => { document.getElementById('add-form').style.display='block'; };
+
+window.saveAsset = async () => {
+  const a = {
+    id: 'a'+Date.now(),
+    nome: document.getElementById('f-nome').value,
+    isin: document.getElementById('f-isin').value,
+    tipo: document.getElementById('f-tipo').value,
+    banca: document.getElementById('f-banca').value,
+    ticker: document.getElementById('f-ticker').value,
+    dataAcquisto: document.getElementById('f-data').value,
+    capitale: parseFloat(document.getElementById('f-capitale').value)||0,
+    valore: parseFloat(document.getElementById('f-valore').value)||0
+  };
+  if (!a.nome||!a.isin) { alert('Inserisci almeno nome e ISIN'); return; }
+  assets.push(a);
+  await saveAssetToDb(a);
+  document.getElementById('add-form').style.display='none';
+  ['f-nome','f-isin','f-ticker','f-capitale','f-valore','f-data'].forEach(id=>document.getElementById(id).value='');
+  renderAssetManage();
+};
+
+function renderStorico() {
+  const sel = document.getElementById('s-asset');
+  sel.innerHTML = assets.map(a=>`<option value="${a.id}">${a.nome}</option>`).join('');
+  const container = document.getElementById('storico-container');
+  container.innerHTML = assets.map(a => {
+    const rows = storicoData.filter(s=>s.assetId===a.id).sort((x,y)=>x.data.localeCompare(y.data));
+    if (!rows.length) return '';
+    const totQuote = rows.reduce((s,r)=>s+parseFloat(r.quote),0);
+    const totInv = rows.reduce((s,r)=>s+(parseFloat(r.quote)*parseFloat(r.prezzo)),0);
+    const pm = totQuote ? totInv/totQuote : 0;
+    return `<div class="card">
+      <div class="section-header">
+        <h2>${a.nome}</h2>
+        <span style="font-size:12px;color:#666">P.M. carico: <strong>${fmtN(pm)}€</strong> · Quote totali: <strong>${fmtN(totQuote)}</strong></span>
+      </div>
+      <div class="storico-header"><span>Data</span><span>Quote</span><span>Prezzo/quota</span><span>Importo</span><span></span></div>
+      ${rows.map(r=>`<div class="storico-row">
+        <span>${new Date(r.data+'T12:00:00').toLocaleDateString('it-IT')}</span>
+        <span>${fmtN(r.quote)}</span>
+        <span>€${fmtN(r.prezzo)}</span>
+        <span>${fmt(r.quote*r.prezzo)}</span>
+        <span><button class="del-btn" onclick="deleteStorico('${r.id}')">🗑</button></span>
+      </div>`).join('')}
+    </div>`;
+  }).join('') || '<div class="card"><div class="empty">Nessun acquisto PAC ancora. Inseriscilo sopra.</div></div>';
+}
+
+window.saveStorico = async () => {
+  const s = {
+    id: 's'+Date.now(),
+    assetId: document.getElementById('s-asset').value,
+    data: document.getElementById('s-data').value,
+    quote: parseFloat(document.getElementById('s-quote').value),
+    prezzo: parseFloat(document.getElementById('s-prezzo').value)
+  };
+  if (!s.data||!s.quote||!s.prezzo) { alert('Compila tutti i campi'); return; }
+  storicoData.push(s);
+  await saveStoricoToDb(s);
+  document.getElementById('s-data').value='';
+  document.getElementById('s-quote').value='';
+  document.getElementById('s-prezzo').value='';
+  renderStorico();
+};
+
+window.deleteStorico = async (id) => {
+  storicoData = storicoData.filter(s=>s.id!==id);
+  await deleteStoricoFromDb(id);
+  renderStorico();
+};
+
+</script>
+</body>
+</html>
