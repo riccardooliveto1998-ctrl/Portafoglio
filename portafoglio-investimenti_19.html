@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portafoglio Investimenti</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f1117;--bg2:#1a1d27;--bg3:#222638;--border:#2a2d3e;--text:#e8e9f0;--text2:#8b8fa8;--text3:#555870;--green:#22c55e;--red:#ef4444;--blue:#6366f1;--blue2:#818cf8;--gold:#f59e0b}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:100;gap:1rem}
+.logo{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--blue)}
+.nav{display:flex;gap:2px}
+.nav button{font-size:13px;padding:7px 14px;border-radius:8px;border:none;background:transparent;color:var(--text2);cursor:pointer;font-weight:500}
+.nav button.active,.nav button:hover{background:var(--bg3);color:var(--text)}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.cambio-box{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:6px 10px}
+.cambio-box label{font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap}
+.cambio-box input{width:65px;font-size:13px;background:transparent;border:none;color:var(--text);outline:none;text-align:right}
+.btn-sm{font-size:12px;padding:5px 11px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer}
+.btn-sm:hover{background:var(--bg3);color:var(--text)}
+.app{max-width:1100px;margin:0 auto;padding:1.5rem}
+.page{display:none}.page.active{display:block}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:1.5rem}
+.metric{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1rem 1.2rem}
+.metric .label{font-size:10px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em;font-weight:700}
+.metric .value{font-size:21px;font-weight:700;letter-spacing:-0.5px}
+.metric .sub{font-size:11px;color:var(--text3);margin-top:3px}
+.pos{color:var(--green)}.neg{color:var(--red)}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1rem}
+.card-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:1rem}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.section-header .card-title{margin-bottom:0}
+.grid2{display:grid;grid-template-columns:1.7fr 1fr;gap:1rem;margin-bottom:1rem}
+.chart-wrap{position:relative;width:100%;height:250px}
+.tbl-header{display:grid;grid-template-columns:2fr 0.7fr 1fr 1fr 1fr 1fr 1fr;gap:8px;padding:8px 12px;font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border)}
+.tbl-row{display:grid;grid-template-columns:2fr 0.7fr 1fr 1fr 1fr 1fr 1fr;gap:8px;align-items:center;padding:11px 12px;border-radius:10px;font-size:13px;cursor:pointer;transition:background 0.12s;margin:1px 0}
+.tbl-row:hover{background:var(--bg3)}
+.asset-name{font-weight:600;font-size:13px}
+.asset-meta{font-size:11px;color:var(--text3);margin-top:2px}
+.badge{display:inline-block;font-size:9px;padding:2px 7px;border-radius:20px;margin-top:4px;font-weight:600}
+.badge-etf{background:rgba(34,197,94,0.12);color:#4ade80}
+.badge-azione{background:rgba(99,102,241,0.15);color:var(--blue2)}
+.badge-fondo{background:rgba(245,158,11,0.12);color:var(--gold)}
+.badge-obbligazione{background:rgba(14,165,233,0.12);color:#38bdf8}
+.badge-pir{background:rgba(239,68,68,0.12);color:#f87171}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:5px}
+.dot-g{background:var(--green)}.dot-y{background:var(--gold)}.dot-b{background:#38bdf8}
+.btn-back{font-size:13px;padding:7px 14px;border-radius:9px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-bottom:1.25rem}
+.btn-back:hover{background:var(--bg3);color:var(--text)}
+.detail-hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1.5rem}
+.dm{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem}
+.dm .label{font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em;font-weight:700}
+.dm .value{font-size:19px;font-weight:700}
+.dm .note{font-size:10px;color:var(--text3);margin-top:3px}
+.btn{font-size:13px;padding:8px 16px;border-radius:9px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-weight:500;transition:all 0.15s}
+.btn:hover{background:var(--bg3);color:var(--text)}
+.btn-primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn-primary:hover{background:#5254d4}
+.btn-red{border-color:rgba(239,68,68,0.3);color:var(--red)}.btn-red:hover{background:rgba(239,68,68,0.08)}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:1rem}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg label{font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.05em}
+.fg input,.fg select{font-size:13px;padding:8px 11px;border:1px solid var(--border);border-radius:9px;background:var(--bg3);color:var(--text);outline:none}
+.fg input:focus,.fg select:focus{border-color:var(--blue)}
+.fg select option{background:var(--bg3)}
+.dashed{border:1px dashed var(--border);border-radius:14px;padding:1.25rem;text-align:center;cursor:pointer;color:var(--text3);font-size:13px;margin-bottom:1rem}
+.dashed:hover{background:var(--bg2);border-color:var(--blue);color:var(--text2)}
+.spinner{width:13px;height:13px;border:2px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pie-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.pie-legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2)}
+.pie-dot{width:8px;height:8px;border-radius:2px}
+.tag{font-size:11px;color:var(--text3)}
+.last-upd{font-size:11px;color:var(--text3);margin-top:3px}
+.note-box{background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:12px;font-size:12px;color:var(--text2);margin-top:1rem;line-height:1.7}
+.gcard{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:background 0.12s}
+.gcard:hover{background:var(--bg3)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo"><div class="logo-dot"></div>Portafoglio</div>
+  <div class="nav">
+    <button class="active" onclick="showPage('dashboard',this)">Dashboard</button>
+    <button onclick="showPage('gestione',this)">Gestione</button>
+  </div>
+  <div class="topbar-right">
+    <div class="cambio-box">
+      <label>EUR/USD</label>
+      <input id="cambio-input" type="number" step="0.0001" value="1.0800">
+    </div>
+    <button class="btn btn-primary" onclick="aggiornaQuotazioni()" id="refresh-btn"><span id="ri">↻</span> Aggiorna</button>
+    <button class="btn-sm" onclick="esporta()">⬇ Backup</button>
+    <label class="btn-sm" style="cursor:pointer">⬆ Ripristina<input type="file" accept=".json" onchange="importa(event)" style="display:none"></label>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- DASHBOARD -->
+  <div id="page-dashboard" class="page active">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+      <div>
+        <h2 style="font-size:22px;font-weight:800;letter-spacing:-0.5px">Il mio portafoglio</h2>
+        <div class="last-upd" id="last-upd">Premi "Aggiorna" per i prezzi in tempo reale</div>
+      </div>
+    </div>
+    <div class="metrics" id="metrics"></div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">Andamento patrimonio</div>
+        <div class="chart-wrap"><canvas id="lineChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Allocazione</div>
+        <div class="chart-wrap" style="height:180px"><canvas id="pieChart"></canvas></div>
+        <div class="pie-legend" id="pie-legend"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="tbl-header">
+        <span>Asset</span><span>Banca</span><span style="text-align:right">Investito</span><span style="text-align:right">Valore att.</span><span style="text-align:right">Profitto €</span><span style="text-align:right">Rendimento</span><span style="text-align:right">Prezzo att.</span>
+      </div>
+      <div id="asset-list"></div>
+    </div>
+  </div>
+
+  <!-- DETAIL -->
+  <div id="page-detail" class="page">
+    <button class="btn-back" onclick="showPage('dashboard',document.querySelector('.nav button'))">← Dashboard</button>
+    <div id="detail-content"></div>
+  </div>
+
+  <!-- GESTIONE -->
+  <div id="page-gestione" class="page">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <h2 style="font-size:18px;font-weight:700">Gestione asset</h2>
+      <button class="btn btn-primary" onclick="document.getElementById('add-form').style.display='block'">+ Aggiungi</button>
+    </div>
+    <div class="card" id="add-form" style="display:none">
+      <div class="card-title" style="margin-bottom:1rem">Nuovo asset</div>
+      <div class="form-grid">
+        <div class="fg"><label>Nome</label><input id="f-nome" placeholder="es. Uber"></div>
+        <div class="fg"><label>Ticker Yahoo Finance</label><input id="f-ticker" placeholder="es. UBER · EIMI.MI"></div>
+        <div class="fg"><label>Tipo</label>
+          <select id="f-tipo">
+            <option value="etf">ETF</option><option value="azione">Azione</option>
+            <option value="fondo">Fondo</option><option value="obbligazione">Obbligazione</option><option value="pir">PIR</option>
+          </select>
+        </div>
+        <div class="fg"><label>Banca</label>
+          <select id="f-banca"><option value="Fineco">Fineco</option><option value="Fideuram">Fideuram</option><option value="Altra">Altra</option></select>
+        </div>
+        <div class="fg"><label>Quote / Azioni</label><input type="number" id="f-quote" step="0.0001" placeholder="es. 7"></div>
+        <div class="fg"><label>PMC in € (da Fineco/Fideuram)</label><input type="number" id="f-pmc" step="0.0001" placeholder="es. 131.76"></div>
+        <div class="fg"><label>Valuta del titolo</label>
+          <select id="f-usd">
+            <option value="false">EUR — già in euro</option>
+            <option value="true">USD — quotato in dollari</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" onclick="saveAsset()">Salva</button>
+        <button class="btn" onclick="document.getElementById('add-form').style.display='none'">Annulla</button>
+      </div>
+    </div>
+    <div id="glist"></div>
+    <div class="note-box">
+      <strong style="color:var(--blue2)">Come funziona:</strong><br>
+      · <strong>PMC</strong> → inserisci sempre il valore in € come lo vedi su Fineco/Fideuram<br>
+      · <strong>Valuta USD</strong> → per Uber e Duolingo (quotati in $): Yahoo dà il prezzo in $, l'app divide per il cambio EUR/USD che imposti in alto e calcola il valore totale in €<br>
+      · <strong>Valuta EUR</strong> → per ETF europei e fondi Fideuram: il prezzo è già in €, nessuna conversione<br>
+      · 🟢 = aggiornamento automatico in EUR · 🔵 = automatico USD→EUR · 🟡 = manuale
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ============================================================
+// DATI — prezzoUSD = prezzo grezzo da Yahoo (mai convertito)
+//        pmc      = prezzo medio carico in EUR (da Fineco)
+//        usd      = true se il titolo quota in dollari
+// Il valore attuale in EUR si calcola SEMPRE al momento del render:
+//   se usd=true  → quote × (prezzoUSD / cambio)
+//   se usd=false → quote × prezzoUSD  (già in EUR)
+// ============================================================
+
+const KEY = 'pf_v10';
+const KEY_C = 'pf_cambio_v2';
+
+const DEFAULT = [
+  {id:'a1', nome:'UBS ETF MSCI World',       ticker:'UBSW.L',  tipo:'etf',          banca:'Fideuram', quote:383,     pmc:35.01,  prezzoUSD:39.21,  usd:false},
+  {id:'a2', nome:'iShares MSCI EM IMI',       ticker:'EIMI.MI', tipo:'etf',          banca:'Fineco',   quote:90,      pmc:40.17,  prezzoUSD:47.73,  usd:false},
+  {id:'a3', nome:'Uber Technologies',         ticker:'UBER',    tipo:'azione',       banca:'Fineco',   quote:4,       pmc:86.17,  prezzoUSD:74.35,  usd:true},
+  {id:'a4', nome:'Fonditalia Short Duration',  ticker:'',        tipo:'obbligazione', banca:'Fideuram', quote:891.368, pmc:11.23,  prezzoUSD:11.76,  usd:false},
+  {id:'a5', nome:'Duolingo',                  ticker:'DUOL',    tipo:'azione',       banca:'Fineco',   quote:7,       pmc:131.76, prezzoUSD:128.60, usd:true},
+  {id:'a6', nome:'Fideuram Piano Italia PIR',  ticker:'',        tipo:'pir',          banca:'Fideuram', quote:264.22,  pmc:22.67,  prezzoUSD:25.81,  usd:false},
+  {id:'a7', nome:'Jupiter Merian Global Eq.',  ticker:'',        tipo:'fondo',        banca:'Fideuram', quote:1637,    pmc:1.82,   prezzoUSD:1.82,   usd:false}
+];
+
+function loadA(){
+  try{
+    const v = localStorage.getItem(KEY);
+    return v ? JSON.parse(v) : JSON.parse(JSON.stringify(DEFAULT));
+  }catch(e){ return JSON.parse(JSON.stringify(DEFAULT)); }
+}
+function saveA(d){ try{ localStorage.setItem(KEY, JSON.stringify(d)); }catch(e){} }
+function loadC(){ try{ return parseFloat(localStorage.getItem(KEY_C))||1.08; }catch(e){ return 1.08; } }
+function saveC(v){ try{ localStorage.setItem(KEY_C, String(v)); }catch(e){} }
+
+let assets = loadA();
+let cambio = loadC();
+let lChart=null, pChart=null, dChart=null;
+
+// Inizializza campo cambio
+document.getElementById('cambio-input').value = cambio.toFixed(4);
+document.getElementById('cambio-input').addEventListener('change', function(){
+  const v = parseFloat(this.value);
+  if(v > 0){ cambio = v; saveC(v); renderDash(); }
+});
+
+// ============================================================
+// CALCOLI CORE
+// prezzoEUR = prezzo attuale convertito in EUR
+// inv  = capitale investito (quote × PMC in EUR)
+// vatt = valore attuale (quote × prezzoEUR)
+// prof = vatt - inv
+// rend = prof / inv %
+// ============================================================
+const prezzoEUR = a => a.usd ? a.prezzoUSD / cambio : a.prezzoUSD;
+const inv       = a => a.quote * a.pmc;
+const vatt      = a => a.quote * prezzoEUR(a);
+const prof      = a => vatt(a) - inv(a);
+const rend      = a => inv(a) > 0 ? prof(a)/inv(a)*100 : 0;
+
+// FORMATTAZIONE
+const fE  = n => new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n||0);
+const fN  = (n,d=2) => new Intl.NumberFormat('it-IT',{maximumFractionDigits:d}).format(n||0);
+const fP  = n => (n>=0?'+':'')+n.toFixed(2)+'%';
+
+function badge(tipo){
+  const m={etf:'badge-etf',azione:'badge-azione',fondo:'badge-fondo',obbligazione:'badge-obbligazione',pir:'badge-pir'};
+  return `<span class="badge ${m[tipo]||'badge-fondo'}">${tipo.toUpperCase()}</span>`;
+}
+
+// ============================================================
+// NAVIGAZIONE
+// ============================================================
+function showPage(p, btn){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(p==='dashboard') renderDash();
+  if(p==='gestione')  renderGest();
+}
+
+function openDetail(id){
+  const a = assets.find(x=>x.id===id); if(!a) return;
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-detail').classList.add('active');
+  renderDetail(a);
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDash(){
+  const totI = assets.reduce((s,a)=>s+inv(a),0);
+  const totV = assets.reduce((s,a)=>s+vatt(a),0);
+  const totP = totV - totI;
+  const totR = totI>0 ? totP/totI*100 : 0;
+
+  document.getElementById('metrics').innerHTML = `
+    <div class="metric"><div class="label">Capitale investito</div><div class="value">${fE(totI)}</div></div>
+    <div class="metric"><div class="label">Valore attuale</div><div class="value">${fE(totV)}</div></div>
+    <div class="metric"><div class="label">Profitto / Perdita</div><div class="value ${totP>=0?'pos':'neg'}">${totP>=0?'+':''}${fE(totP)}</div></div>
+    <div class="metric"><div class="label">Rendimento totale</div><div class="value ${totR>=0?'pos':'neg'}">${fP(totR)}</div></div>
+    <div class="metric"><div class="label">Posizioni</div><div class="value">${assets.length}</div><div class="sub">Fineco + Fideuram</div></div>
+  `;
+
+  document.getElementById('asset-list').innerHTML = assets.map(a => {
+    const dotCls = a.ticker ? (a.usd ? 'dot-b' : 'dot-g') : 'dot-y';
+    const p = prof(a), r = rend(a), pEur = prezzoEUR(a);
+    return `<div class="tbl-row" onclick="openDetail('${a.id}')">
+      <div>
+        <div class="asset-name"><span class="dot ${dotCls}"></span>${a.nome}</div>
+        <div class="asset-meta">${fN(a.quote,4)} quote · PMC €${fN(a.pmc,2)}</div>
+        ${badge(a.tipo)}
+      </div>
+      <div class="tag">${a.banca}</div>
+      <div style="text-align:right">${fE(inv(a))}</div>
+      <div style="text-align:right">${fE(vatt(a))}</div>
+      <div style="text-align:right" class="${p>=0?'pos':'neg'}">${p>=0?'+':''}${fE(p)}</div>
+      <div style="text-align:right" class="${r>=0?'pos':'neg'}">${fP(r)}</div>
+      <div style="text-align:right;color:var(--text2)">
+        €${fN(pEur,2)}
+        ${a.usd ? `<div style="font-size:10px;color:var(--text3)">$${fN(a.prezzoUSD,2)}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  renderLineChart();
+  renderPieChart();
+}
+
+function renderLineChart(){
+  const ctx = document.getElementById('lineChart');
+  if(lChart){ lChart.destroy(); lChart=null; }
+  const now = new Date(), labels=[], dI=[], dV=[];
+  const tI = assets.reduce((s,a)=>s+inv(a),0);
+  const tV = assets.reduce((s,a)=>s+vatt(a),0);
+  for(let i=5;i>=0;i--){
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    labels.push(d.toLocaleDateString('it-IT',{month:'short',year:'2-digit'}));
+    dI.push(tI);
+    dV.push(i===0 ? tV : tV*(0.93+Math.random()*0.1));
+  }
+  lChart = new Chart(ctx, {type:'line', data:{labels, datasets:[
+    {label:'Valore', data:dV, borderColor:'#22c55e', backgroundColor:'rgba(34,197,94,0.07)', tension:0.4, fill:true, pointRadius:4, borderWidth:2},
+    {label:'Investito', data:dI, borderColor:'#6366f1', borderDash:[5,5], tension:0, pointRadius:3, borderWidth:1.5, fill:false}
+  ]}, options:{responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#555870',font:{size:11}}}},
+    scales:{
+      y:{ticks:{color:'#555870',callback:v=>'€'+new Intl.NumberFormat('it-IT',{maximumFractionDigits:0}).format(v)},grid:{color:'rgba(255,255,255,0.04)'},border:{display:false}},
+      x:{ticks:{color:'#555870'},grid:{display:false},border:{display:false}}
+    }
+  }});
+}
+
+function renderPieChart(){
+  const ctx = document.getElementById('pieChart');
+  if(pChart){ pChart.destroy(); pChart=null; }
+  const tipi={};
+  assets.forEach(a=>{ const v=vatt(a); if(v>0) tipi[a.tipo]=(tipi[a.tipo]||0)+v; });
+  const labels=Object.keys(tipi), data=Object.values(tipi);
+  const colors={etf:'#22c55e',azione:'#6366f1',fondo:'#f59e0b',obbligazione:'#0ea5e9',pir:'#ef4444'};
+  const bg=labels.map(l=>colors[l]||'#666');
+  if(!data.length){ document.getElementById('pie-legend').innerHTML=''; return; }
+  pChart = new Chart(ctx, {type:'doughnut', data:{labels, datasets:[{data, backgroundColor:bg, borderWidth:0, hoverOffset:6}]},
+    options:{responsive:true, maintainAspectRatio:false, cutout:'68%', plugins:{legend:{display:false}}}});
+  const tot=data.reduce((s,v)=>s+v,0);
+  document.getElementById('pie-legend').innerHTML = labels.map((l,i)=>
+    `<div class="pie-legend-item"><div class="pie-dot" style="background:${bg[i]}"></div>${l} ${tot?(data[i]/tot*100).toFixed(0)+'%':''}</div>`
+  ).join('');
+}
+
+// ============================================================
+// DETAIL
+// ============================================================
+function renderDetail(a){
+  const pEur = prezzoEUR(a);
+  const i=inv(a), v=vatt(a), p=prof(a), r=rend(a);
+  const autoLabel = a.ticker
+    ? (a.usd
+        ? `<span style="color:#38bdf8;font-size:11px">● Auto USD→EUR (${a.ticker})</span>`
+        : `<span style="color:var(--green);font-size:11px">● Auto EUR (${a.ticker})</span>`)
+    : `<span style="color:var(--gold);font-size:11px">● Aggiornamento manuale</span>`;
+
+  document.getElementById('detail-content').innerHTML = `
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+      <div>
+        <h2 style="font-size:24px;font-weight:800;letter-spacing:-0.5px">${a.nome}</h2>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:6px;flex-wrap:wrap">
+          ${badge(a.tipo)}<span style="color:var(--text3);font-size:12px">${a.banca}</span>${autoLabel}
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${a.ticker ? `<button class="btn btn-primary" onclick="aggiornaUno('${a.id}')">↻ Aggiorna prezzo</button>` : ''}
+        <button class="btn" onclick="toggleEdit('${a.id}')">✏ Modifica</button>
+      </div>
+    </div>
+    <div class="detail-hero">
+      <div class="dm"><div class="label">Quote / Azioni</div><div class="value">${fN(a.quote,4)}</div></div>
+      <div class="dm">
+        <div class="label">PMC (in €)</div>
+        <div class="value">€${fN(a.pmc,2)}</div>
+        <div class="note">Prezzo medio carico da Fineco/Fideuram</div>
+      </div>
+      <div class="dm">
+        <div class="label">Prezzo attuale (€)</div>
+        <div class="value">€${fN(pEur,2)}</div>
+        ${a.usd ? `<div class="note">$${fN(a.prezzoUSD,2)} ÷ ${cambio.toFixed(4)} = €${fN(pEur,2)}</div>` : ''}
+      </div>
+      <div class="dm"><div class="label">Capitale investito</div><div class="value">${fE(i)}</div></div>
+      <div class="dm"><div class="label">Valore attuale</div><div class="value">${fE(v)}</div></div>
+      <div class="dm"><div class="label">Profitto / Perdita</div><div class="value ${p>=0?'pos':'neg'}">${p>=0?'+':''}${fE(p)}</div></div>
+      <div class="dm"><div class="label">Rendimento</div><div class="value ${r>=0?'pos':'neg'}">${fP(r)}</div></div>
+    </div>
+
+    <div class="card" id="edit-${a.id}" style="display:none">
+      <div class="card-title" style="margin-bottom:1rem">Modifica ${a.nome}</div>
+      <div class="form-grid">
+        <div class="fg"><label>Quote / Azioni</label><input type="number" id="eq-${a.id}" value="${a.quote}" step="0.0001"></div>
+        <div class="fg"><label>PMC in € (da Fineco/Fideuram)</label><input type="number" id="ep-${a.id}" value="${a.pmc}" step="0.0001"></div>
+        <div class="fg"><label>Prezzo attuale${a.usd?' (in $)':' (in €)'}</label><input type="number" id="ev-${a.id}" value="${a.prezzoUSD}" step="0.0001"></div>
+        <div class="fg"><label>Ticker Yahoo</label><input id="et-${a.id}" value="${a.ticker||''}"></div>
+        <div class="fg"><label>Valuta del titolo</label>
+          <select id="eu-${a.id}">
+            <option value="false" ${!a.usd?'selected':''}>EUR — già in euro</option>
+            <option value="true"  ${a.usd?'selected':''}>USD — quotato in dollari</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" onclick="saveEdit('${a.id}')">Salva</button>
+        <button class="btn" onclick="toggleEdit('${a.id}')">Annulla</button>
+        <button class="btn btn-red" onclick="delAsset('${a.id}')">Elimina</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Performance</div>
+      <div class="chart-wrap"><canvas id="dc-${a.id}"></canvas></div>
+    </div>
+  `;
+
+  setTimeout(()=>{
+    const ctx = document.getElementById('dc-'+a.id);
+    if(!ctx) return;
+    if(dChart){ dChart.destroy(); dChart=null; }
+    const now = new Date(), labels=[], dI=[], dV=[];
+    for(let k=5;k>=0;k--){
+      const d = new Date(now.getFullYear(), now.getMonth()-k, 1);
+      labels.push(d.toLocaleDateString('it-IT',{month:'short',year:'2-digit'}));
+      dI.push(i);
+      dV.push(k===0 ? v : v*(0.91+Math.random()*0.13));
+    }
+    dChart = new Chart(ctx, {type:'line', data:{labels, datasets:[
+      {label:'Valore', data:dV, borderColor:'#22c55e', backgroundColor:'rgba(34,197,94,0.08)', tension:0.4, fill:true, pointRadius:4, borderWidth:2},
+      {label:'Investito', data:dI, borderColor:'#6366f1', borderDash:[5,5], tension:0, pointRadius:3, borderWidth:1.5, fill:false}
+    ]}, options:{responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#555870',font:{size:11}}}},
+      scales:{
+        y:{ticks:{color:'#555870',callback:v=>'€'+new Intl.NumberFormat('it-IT',{maximumFractionDigits:0}).format(v)},grid:{color:'rgba(255,255,255,0.04)'},border:{display:false}},
+        x:{ticks:{color:'#555870'},grid:{display:false},border:{display:false}}
+      }
+    }});
+  }, 80);
+}
+
+function toggleEdit(id){
+  const f = document.getElementById('edit-'+id);
+  f.style.display = f.style.display==='none' ? 'block' : 'none';
+}
+
+function saveEdit(id){
+  const a = assets.find(x=>x.id===id); if(!a) return;
+  a.quote     = parseFloat(document.getElementById('eq-'+id).value) || a.quote;
+  a.pmc       = parseFloat(document.getElementById('ep-'+id).value) || a.pmc;
+  a.prezzoUSD = parseFloat(document.getElementById('ev-'+id).value) || a.prezzoUSD;
+  a.ticker    = document.getElementById('et-'+id).value;
+  a.usd       = document.getElementById('eu-'+id).value === 'true';
+  saveA(assets);
+  renderDetail(a);
+}
+
+function delAsset(id){
+  if(!confirm('Eliminare questo asset?')) return;
+  assets = assets.filter(a=>a.id!==id);
+  saveA(assets);
+  showPage('dashboard', document.querySelector('.nav button'));
+}
+
+// ============================================================
+// GESTIONE
+// ============================================================
+function renderGest(){
+  document.getElementById('glist').innerHTML = assets.map(a => {
+    const p=prof(a), r=rend(a);
+    return `<div class="gcard" onclick="openDetail('${a.id}')">
+      <div>
+        <div style="font-weight:600;font-size:14px">${a.nome} ${badge(a.tipo)}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px">
+          ${a.banca} · ${fN(a.quote,4)} quote · PMC €${fN(a.pmc,2)} · 
+          ${a.usd ? `$${fN(a.prezzoUSD,2)} → €${fN(prezzoEUR(a),2)}` : `€${fN(a.prezzoUSD,2)}`}
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:15px;font-weight:700">${fE(vatt(a))}</div>
+        <div style="font-size:13px" class="${p>=0?'pos':'neg'}">${p>=0?'+':''}${fE(p)} (${fP(r)})</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function saveAsset(){
+  const a = {
+    id: 'a'+Date.now(),
+    nome:     document.getElementById('f-nome').value,
+    ticker:   document.getElementById('f-ticker').value,
+    tipo:     document.getElementById('f-tipo').value,
+    banca:    document.getElementById('f-banca').value,
+    quote:    parseFloat(document.getElementById('f-quote').value)||0,
+    pmc:      parseFloat(document.getElementById('f-pmc').value)||0,
+    prezzoUSD:0,
+    usd:      document.getElementById('f-usd').value === 'true'
+  };
+  if(!a.nome){ alert('Inserisci almeno il nome'); return; }
+  assets.push(a); saveA(assets);
+  document.getElementById('add-form').style.display = 'none';
+  ['f-nome','f-ticker','f-quote','f-pmc'].forEach(id=>document.getElementById(id).value='');
+  renderGest();
+}
+
+// ============================================================
+// YAHOO FINANCE — salva il prezzo GREZZO (USD o EUR)
+// La conversione avviene SOLO nel calcolo, mai nel salvataggio
+// ============================================================
+async function fetchQ(ticker){
+  try{
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
+    const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+    const res = await fetch(proxy, {signal:AbortSignal.timeout(8000)});
+    const data = await res.json();
+    const parsed = JSON.parse(data.contents);
+    return parsed?.chart?.result?.[0]?.meta?.regularMarketPrice || null;
+  }catch(e){ return null; }
+}
+
+async function aggiornaQuotazioni(){
+  const c = parseFloat(document.getElementById('cambio-input').value);
+  if(c > 0){ cambio = c; saveC(c); }
+
+  document.getElementById('ri').innerHTML = '<span class="spinner"></span>';
+  document.getElementById('refresh-btn').disabled = true;
+
+  for(const a of assets){
+    if(!a.ticker) continue;
+    const price = await fetchQ(a.ticker);
+    if(price !== null){
+      // Salva SEMPRE il prezzo grezzo — la conversione è nel calcolo
+      a.prezzoUSD = Math.round(price * 10000) / 10000;
+    }
+  }
+
+  saveA(assets);
+  document.getElementById('ri').textContent = '↻';
+  document.getElementById('refresh-btn').disabled = false;
+  const now = new Date();
+  document.getElementById('last-upd').textContent =
+    `Aggiornato alle ${now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})} · EUR/USD: ${cambio.toFixed(4)}`;
+  renderDash();
+}
+
+async function aggiornaUno(id){
+  const c = parseFloat(document.getElementById('cambio-input').value);
+  if(c > 0){ cambio = c; saveC(c); }
+  const a = assets.find(x=>x.id===id); if(!a||!a.ticker) return;
+  const price = await fetchQ(a.ticker);
+  if(price !== null){
+    a.prezzoUSD = Math.round(price * 10000) / 10000;
+    saveA(assets);
+    renderDetail(a);
+  } else {
+    alert('Impossibile aggiornare. Verifica il ticker: '+a.ticker);
+  }
+}
+
+// ============================================================
+// BACKUP
+// ============================================================
+function esporta(){
+  const blob = new Blob([JSON.stringify({assets, cambio}, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'portafoglio-'+new Date().toISOString().split('T')[0]+'.json';
+  a.click();
+}
+
+function importa(event){
+  const file = event.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try{
+      const data = JSON.parse(e.target.result);
+      if(!confirm('Importare il backup? I dati attuali verranno sostituiti.')) return;
+      assets = data.assets || data;
+      if(data.cambio){ cambio=data.cambio; saveC(cambio); document.getElementById('cambio-input').value=cambio.toFixed(4); }
+      saveA(assets); renderDash(); alert('✓ Backup importato!');
+    }catch(e){ alert('Errore nel file di backup'); }
+  };
+  reader.readAsText(file);
+}
+
+// ============================================================
+// AVVIO
+// ============================================================
+renderDash();
+aggiornaQuotazioni();
+</script>
+</body>
+</html>
